@@ -1,4 +1,4 @@
-# Copyright 2017 The TensorFlow Authors. All Rights Reserved.
+    # Copyright 2017 The TensorFlow Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -71,7 +71,7 @@ def load_labels(label_file):
   return label
 
 if __name__ == "__main__":
-  file_name = "tf_files/test.jpg"
+  file_name = "tf_files/videos"
   model_file = "tf_files/retrained_graph.pb"
   label_file = "tf_files/retrained_labels.txt"
   output = "output"
@@ -138,8 +138,8 @@ if __name__ == "__main__":
           frameId = video_capture.get(1) #current frame number
           if ((frameId % 2) ==0 and (ret == True)):
 
-              cv2.imwrite(filename="C:/Users/speno/tensorflow-for-poets-2/screens/"+"alpha.jpg", img=frame);
-              image_data = "C:/Users/speno/tensorflow-for-poets-2/screens/alpha.jpg"
+              cv2.imwrite(filename="screens/"+"alpha.jpg", img=frame);
+              image_data = "screens/alpha.jpg"
               t = read_tensor_from_image_file(image_data,
                                               input_height=input_height,
                                               input_width=input_width,
@@ -152,50 +152,44 @@ if __name__ == "__main__":
               output_operation = graph.get_operation_by_name(output_name);
 
               with tf.Session(graph=graph) as sess:
-                #start = time.time()
                 results = sess.run(output_operation.outputs[0],
                                   {input_operation.outputs[0]: t})
-                #end=time.time()
               results = np.squeeze(results)
 
               top_k = results.argsort()[-5:][::-1]
               labels = load_labels(label_file)
 
-              print (labels[0], results[0])
-
-              new_frame = cv2.resize(frame, (960,540))
-
-
+	      #quantization of confidence levels	
               if (labels[0]=="chew" and results[0]>0.9):
                 smooth_lst.append("1")
               else:
                 smooth_lst.append("0")
 
               numlist = [int(x) for x in smooth_lst]
-              print (numlist)
+
+              new_frame = cv2.resize(frame, (960,540))
+		
+	      #utilising box convolution to ensure enough chews have occured to be registered
               if (sum(numlist)>=4 and toggle == True):
 
                   toggle = False
-                  print ("HERE WE GOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO!!")
-                  print (frameId)
                   chew_count += 1
 
                   #populate dict with times of chews, time.time works on Unix and Windows but time.clock doesnt
                   times[chew_count] = frameId
 
-                  #superimpose "Chew" text on output frame
-
-                  print (times)
-                  #print (numlist)
+	      #allow more chews to be found	
               if (sum(numlist)==0):
                   toggle = True
 
-              if (toggle == False):
-                  font = cv2.FONT_HERSHEY_SIMPLEX
-                  cv2.putText(new_frame,'Chew',(10,60), font, 2,(124,252,0),2,cv2.LINE_AA)
 
-              cv2.imshow('image',new_frame)
-              cv2.waitKey(30)
+              if (toggle == False):
+                   #superimpose "Chew" text on output frame
+                   font = cv2.FONT_HERSHEY_SIMPLEX
+                   cv2.putText(new_frame,'Chew',(10,60), font, 2,(124,252,0),2,cv2.LINE_AA)
+
+              img_path = "D:/Jpegs"
+              cv2.imwrite(img_path+"/"+str(frameId)+video_name[:-4]+".jpg", new_frame)
 
           if (ret == False):
               break
