@@ -164,7 +164,7 @@ if __name__ == "__main__":
               print (labels[0], results[0])
 
 
-              if (labels[0]=="chew" and results[0]>0.9):
+              if (labels[0]=="chew" and results[0]>0.99):
                 smooth_lst.append("1")
               else:
                 smooth_lst.append("0")
@@ -174,7 +174,7 @@ if __name__ == "__main__":
 
               new_frame = cv2.resize(frame, (960,540))
 
-              if (sum(numlist)>=4 and toggle == True):
+              if (sum(numlist)>=7 and toggle == True):
 
                   toggle = False
                   print ("HERE WE GOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO!!")
